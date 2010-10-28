@@ -12,21 +12,7 @@
 </script>
 <script src="../locust.js" type="text/javascript" charset="utf-8"></script>
 <script src="../js/feed.js" type="text/javascript" charset="utf-8"></script>
-
-<script type="text/javascript" charset="utf-8">
-  var map;
-  function loadMap() {
-    map = new locust.Map({
-      marker_info : loci
-    });
-    if (param('tag')) {
-      map.showLociByTag(param('tag'));
-    } else if (param('show')){
-      map.showLocusById(param('show'));
-    }
-  }
-</script>
-
+<script src="run.js" type="text/javascript" charset="utf-8"></script>
 </head>
 <body onload="loadMap()">
   <div id="map_canvas" style="width:100%; height:100%"></div>

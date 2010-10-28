@@ -2,9 +2,8 @@
 --------------------------------------------------------------------------------
 Behaviors:
   x Can link directly to store from outside page
-  - Can display markers for stores in a specific category
+  x Can display markers for stores in a specific category
   - Can display store details and link by clicking on marker
-  - 
   
 Classes:
   Map
@@ -53,16 +52,32 @@ locust.Marker = function(options) {
 
   // Replace the defaults with any passed in parameters;
   for (var n in options) { this[n] = arguments[0][n]; }
+
+  this.infowindow = new google.maps.InfoWindow({
+      content: this.content
+  });
+
 }
 
 locust.Marker.prototype.show = function() {
-  var marker = 'http://dev.todd.com/google_maps/images/flash.png'
+  var locus = this;
+
+  var pointer_image = 'http://dev.todd.com/google_maps/images/flash.png'
   var marker = new google.maps.Marker({
-    position: new google.maps.LatLng(this.latitude, this.longitude), 
-    map:   this.map, 
-    title: this.name,
-    icon: marker
+    position: new google.maps.LatLng(locus.latitude, locus.longitude), 
+    map:   locus.map, 
+    title: locus.name,
+    icon: pointer_image
   });
+
+  locus.marker = marker;
+  google.maps.event.addListener(marker, 'click', function() {
+    locus.showInfoWindow();
+  });
+}
+
+locust.Marker.prototype.showInfoWindow = function() {
+  this.infowindow.open(this.map, this.marker);
 }
 
 locust.Map = function(options) {
@@ -71,7 +86,7 @@ locust.Map = function(options) {
   m.center      = new locust.Marker();
   m.zoomLevel   = 17;
   m.mapType     = 'roadmap'; // ['roadmap', 'satellite', 'hybrid']
-  m.marker_info = [];
+  m.locus_info  = [];
   m.loci        = [];
 
   // Replace the defaults with any passed in parameters;
@@ -79,9 +94,10 @@ locust.Map = function(options) {
 
   this.initialize();  
 
-  for(i = 0; i < m.marker_info.length; ++i){
-    var locus = new locust.Marker(m.marker_info[i])
+  for(i = 0; i < m.locus_info.length; ++i){
+    var locus = new locust.Marker(m.locus_info[i])
     locus.map = m.map;
+
     m.loci.push(locus);
   }
 }
@@ -112,10 +128,13 @@ locust.Map.prototype.getLocusById = function(id){
   return false;
 }
 
-locust.Map.prototype.showLociByTag = function(tag){
+locust.Map.prototype.showLociByTag = function(tag, open_info_window){
   var loci = this.getLociByTag(tag);
   for(i = 0; i < loci.length; ++i){
     loci[i].show();
+    if (open_info_window){
+      loci[i].showInfoWindow();
+    }
   }
 }
 
@@ -129,17 +148,6 @@ locust.Map.prototype.getLociByTag = function(tag) {
     }
   }
   return matches;
-}
-
-function param( name ) {
-  name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
-  var regexS = "[\\?&]"+name+"=([^&#]*)";
-  var regex = new RegExp( regexS );
-  var results = regex.exec( window.location.href );
-  if( results == null )
-    return "";
-  else
-    return results[1];
 }
 
 function oc(a)
