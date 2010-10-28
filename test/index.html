@@ -10,14 +10,18 @@
 <script type="text/javascript"
     src="http://maps.google.com/maps/api/js?sensor=false">
 </script>
-<script src="js/locust.js" type="text/javascript" charset="utf-8"></script>
+<script src="../locust.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/feed.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
+  var map;
   function loadMap() {
-    new locust.Map({
-      latitude: 47.675988,
-      longitude: -122.372604
+    map = new locust.Map({
+      marker_info : loci
     });
+    if (param('show')){
+      map.showLocusById(param('show'));
+    }
   }
 </script>
 
