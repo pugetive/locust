@@ -19,7 +19,9 @@
     map = new locust.Map({
       marker_info : loci
     });
-    if (param('show')){
+    if (param('tag')) {
+      map.showLociByTag(param('tag'));
+    } else if (param('show')){
       map.showLocusById(param('show'));
     }
   }

@@ -16,7 +16,7 @@ Classes:
     * name
     * description
     * image
-    .showMarker()
+    .show()
   Tag
     * name
     .showMarkers()    
@@ -55,7 +55,7 @@ locust.Marker = function(options) {
   for (var n in options) { this[n] = arguments[0][n]; }
 }
 
-locust.Marker.prototype.showMarker = function() {
+locust.Marker.prototype.show = function() {
   var marker = 'http://dev.todd.com/google_maps/images/flash.png'
   var marker = new google.maps.Marker({
     position: new google.maps.LatLng(this.latitude, this.longitude), 
@@ -100,7 +100,7 @@ locust.Map.prototype.initialize = function() {
 locust.Map.prototype.showLocusById = function(id) {
   var locus = this.getLocusById(id);
   this.map.center = new google.maps.LatLng(locus.latitude, locus.longitude)
-  locus.showMarker();
+  locus.show();
 }
 
 locust.Map.prototype.getLocusById = function(id){
@@ -112,6 +112,25 @@ locust.Map.prototype.getLocusById = function(id){
   return false;
 }
 
+locust.Map.prototype.showLociByTag = function(tag){
+  var loci = this.getLociByTag(tag);
+  for(i = 0; i < loci.length; ++i){
+    loci[i].show();
+  }
+}
+
+locust.Map.prototype.getLociByTag = function(tag) {
+  var matches = [];
+  for (i = 0; i < this.loci.length; ++i){
+    var locus = this.loci[i];
+    var tags = locus.tags.split(',');
+    if (tag in oc(tags)){
+      matches.push(locus)
+    }
+  }
+  return matches;
+}
+
 function param( name ) {
   name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
   var regexS = "[\\?&]"+name+"=([^&#]*)";
@@ -121,4 +140,14 @@ function param( name ) {
     return "";
   else
     return results[1];
+}
+
+function oc(a)
+{
+  var o = {};
+  for(var i=0;i<a.length;i++)
+  {
+    o[a[i]]='';
+  }
+  return o;
 }
