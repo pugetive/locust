@@ -31,16 +31,17 @@ Build, fetch, or include a JSON feed:
       ...etc...
     ];
 
-Then construct a Map object and show markers by tag or ID:
+Then construct a Map object and show markers by tag or ID (this assumes you're grabbing query variables with a "param" function):
 
     map = new locust.Map({
-      locus_info : locus_info
+      canvasID  : 'target-element-id',
+      locusInfo : locus_info
     });
 
     if (param('tag')) {
       // Second argument is optional boolean to automatically open 
       // info windows containing the content for each marker
-      map.showLociByTag('sometag', true); 
+      map.showLociByTag(param('tag'), true); 
     } else if (param('show')){
-      map.showLocusById('someID');
+      map.showLocusById(param('show'));
     }

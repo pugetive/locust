@@ -109,17 +109,17 @@ locust.Marker.prototype.showInfoWindow = function() {
 locust.Map = function(options) {
   var m = this;
 
-  m.center      = new locust.Marker();
-  m.zoomLevel   = 17;
-  m.mapType     = 'roadmap'; // ['roadmap', 'satellite', 'hybrid']
-  m.locusInfo  = [];
-  m.loci        = [];
-  m.canvasID    = 'map_canvas';
+  m.center    = new locust.Marker();
+  m.zoomLevel = 17;
+  m.mapType   = 'roadmap'; // ['roadmap', 'satellite', 'hybrid']
+  m.locusInfo = [];
+  m.loci      = [];
+  m.canvasID  = 'map_canvas';
 
   // Replace the defaults with any passed in parameters;
   for (var n in options) { this[n] = arguments[0][n]; }
 
-  this.initialize();  
+  m.initialize();  
 
   for(i = 0; i < m.locusInfo.length; ++i){
     var locus = new locust.Marker(m.locusInfo[i])
