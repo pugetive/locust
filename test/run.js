@@ -23,4 +23,3 @@ function param( name ) {
   else
     return results[1];
 }
-

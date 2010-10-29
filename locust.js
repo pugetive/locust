@@ -45,14 +45,24 @@ locust  = {
   Marker : function() {}
 }
 
+
+
+
+
+/**
+-------------------------------------------------------------------------------- 
+   Marker class
+-------------------------------------------------------------------------------- 
+*/
+
 locust.Marker = function(options) {
   this.name      = "Unnamed Location";
   this.latitude  =   47.62074;
   this.longitude = -122.349308;
-
   // Replace the defaults with any passed in parameters;
   for (var n in options) { this[n] = arguments[0][n]; }
 
+  this.latLng    = new google.maps.LatLng(this.latitude, this.longitude);
   this.infowindow = new google.maps.InfoWindow({
       content: this.content
   });
@@ -65,9 +75,9 @@ locust.Marker.prototype.show = function() {
   var pointer_image = 'http://dev.todd.com/google_maps/images/flash.png'
   var marker = new google.maps.Marker({
     position: new google.maps.LatLng(locus.latitude, locus.longitude), 
-    map:   locus.map, 
-    title: locus.name,
-    icon: pointer_image
+    map   : locus.map, 
+    title : locus.name,
+    icon  : pointer_image
   });
 
   locus.marker = marker;
@@ -79,6 +89,17 @@ locust.Marker.prototype.show = function() {
 locust.Marker.prototype.showInfoWindow = function() {
   this.infowindow.open(this.map, this.marker);
 }
+
+
+
+
+
+
+/**
+-------------------------------------------------------------------------------- 
+   Map class
+-------------------------------------------------------------------------------- 
+*/
 
 locust.Map = function(options) {
   var m = this;
@@ -106,17 +127,20 @@ locust.Map = function(options) {
 locust.Map.prototype.initialize = function() {
   var latlng = new google.maps.LatLng(this.center.latitude, this.center.longitude);
   var myOptions = {
-    zoom: this.zoomLevel,
-    center: latlng,
-    mapTypeId: this.mapType
+    zoom      : this.zoomLevel,
+    center    : latlng,
+    mapTypeId : this.mapType
   };
   this.map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
 }
 
 locust.Map.prototype.showLocusById = function(id) {
   var locus = this.getLocusById(id);
-  this.map.center = new google.maps.LatLng(locus.latitude, locus.longitude)
-  locus.show();
+  if (locus){
+    this.map.center = new google.maps.LatLng(locus.latitude, locus.longitude)
+    locus.show();
+    return
+  }
 }
 
 locust.Map.prototype.getLocusById = function(id){
@@ -130,12 +154,16 @@ locust.Map.prototype.getLocusById = function(id){
 
 locust.Map.prototype.showLociByTag = function(tag, open_info_window){
   var loci = this.getLociByTag(tag);
+  var bounds = new google.maps.LatLngBounds();
+
   for(i = 0; i < loci.length; ++i){
     loci[i].show();
+    bounds.extend(loci[i].latLng);
     if (open_info_window){
       loci[i].showInfoWindow();
     }
   }
+  this.map.fitBounds(bounds);
 }
 
 locust.Map.prototype.getLociByTag = function(tag) {
@@ -149,6 +177,16 @@ locust.Map.prototype.getLociByTag = function(tag) {
   }
   return matches;
 }
+
+
+
+
+
+/**
+-------------------------------------------------------------------------------- 
+   Utilities
+-------------------------------------------------------------------------------- 
+*/
 
 function oc(a)
 {
