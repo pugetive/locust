@@ -1,41 +1,44 @@
 /**
+Locust: a JavaScript wrapper for the Google Maps API
+@author Todd Gehman (toddgehman@gmail.com)
+Copyright (c) 2010 Todd Gehman
+
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+
+
+/**
 --------------------------------------------------------------------------------
-Behaviors:
-  x Can link directly to store from outside page
-  x Can display markers for stores in a specific category
-  - Can display store details and link by clicking on marker
-  
-Classes:
+Classes and methods:
+
   Map
-    * size
-    * starting depth
-    * draw()
-  Marker
-    * id
-    * name
-    * description
-    * image
-    .show()
-  Tag
-    * name
-    .showMarkers()    
+    .showLocusById(id)
+    .getLocusById(id)
+    .showLociByTag(tag, <show_info_window:bool>)
+    .getLociByTag(tag)
     
+  Marker
+    .show()
+    
+Example data feed in js/feed.js
 
-Example setup:
-
-loci = 
-  [
-    {
-      :name        => "My Store",
-      :id          => 'unique key', 
-      :latitude    => 123,
-      :longitude   => 123,
-      :thumbnail   => 'my-url.jpg',
-      :description => 'My teaser',
-      :category    => Category
-    }      
-  ]
-  
 -------------------------------------------------------------------------------- 
 */
 
@@ -59,6 +62,7 @@ locust.Marker = function(options) {
   this.name      = "Unnamed Location";
   this.latitude  =   47.62074;
   this.longitude = -122.349308;
+
   // Replace the defaults with any passed in parameters;
   for (var n in options) { this[n] = arguments[0][n]; }
 
@@ -69,15 +73,16 @@ locust.Marker = function(options) {
 
 }
 
+
 locust.Marker.prototype.show = function() {
   var locus = this;
 
-  var pointer_image = 'http://dev.todd.com/google_maps/images/flash.png'
+  // var pointer_image = 'http://dev.todd.com/google_maps/images/flash.png'
   var marker = new google.maps.Marker({
     position: new google.maps.LatLng(locus.latitude, locus.longitude), 
     map   : locus.map, 
     title : locus.name,
-    icon  : pointer_image
+    // icon  : pointer_image
   });
 
   locus.marker = marker;
@@ -107,16 +112,17 @@ locust.Map = function(options) {
   m.center      = new locust.Marker();
   m.zoomLevel   = 17;
   m.mapType     = 'roadmap'; // ['roadmap', 'satellite', 'hybrid']
-  m.locus_info  = [];
+  m.locusInfo  = [];
   m.loci        = [];
+  m.canvasID    = 'map_canvas';
 
   // Replace the defaults with any passed in parameters;
   for (var n in options) { this[n] = arguments[0][n]; }
 
   this.initialize();  
 
-  for(i = 0; i < m.locus_info.length; ++i){
-    var locus = new locust.Marker(m.locus_info[i])
+  for(i = 0; i < m.locusInfo.length; ++i){
+    var locus = new locust.Marker(m.locusInfo[i])
     locus.map = m.map;
 
     m.loci.push(locus);
@@ -131,8 +137,9 @@ locust.Map.prototype.initialize = function() {
     center    : latlng,
     mapTypeId : this.mapType
   };
-  this.map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+  this.map = new google.maps.Map(document.getElementById(this.canvasID), myOptions);
 }
+
 
 locust.Map.prototype.showLocusById = function(id) {
   var locus = this.getLocusById(id);
@@ -143,6 +150,7 @@ locust.Map.prototype.showLocusById = function(id) {
   }
 }
 
+
 locust.Map.prototype.getLocusById = function(id){
   for(i = 0; i < this.loci.length; ++i){
     if (this.loci[i].id == id){
@@ -151,6 +159,7 @@ locust.Map.prototype.getLocusById = function(id){
   }
   return false;
 }
+
 
 locust.Map.prototype.showLociByTag = function(tag, open_info_window){
   var loci = this.getLociByTag(tag);
@@ -165,6 +174,7 @@ locust.Map.prototype.showLociByTag = function(tag, open_info_window){
   }
   this.map.fitBounds(bounds);
 }
+
 
 locust.Map.prototype.getLociByTag = function(tag) {
   var matches = [];

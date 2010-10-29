@@ -17,32 +17,30 @@ Build, fetch, or include a JSON feed:
         name      : "Space Needle",
         latitude  : 47.62074,
         longitude : -122.349308,
-        tags      : ['tourist'],
-        content   : 'Space Needle: a shining example of retro-futurism.'
+        tags      : ['seattle center'],
+        content   : "Space Needle: Seattle's gift to retro-futurism."
       },
       {
         id        : '2',
-        name      : 'EMP',
+        name      : 'Experience Music Project',
         latitude  : 47.621283,
         longitude : -122.348514,
-        tags      : ['tourist', 'music'],
-        content   : 'EPM: an architectural blob featuring a monorail and some Replacements memorabilia.'
-      },
+        tags      : ['music', 'seattle center'],
+        content   : 'EMP: an architectural blob with a monorail and some Replacements memorabilia.'
+        },
       ...etc...
     ];
 
 Then construct a Map object and show markers by tag or ID:
 
-    function loadMap() {
-      map = new locust.Map({
-        locus_info : locus_info
-      });
+    map = new locust.Map({
+      locus_info : locus_info
+    });
 
-      if (param('tag')) {
-        // Second argument is optional boolean to automatically open info windows
-        // for each marker
-        map.showLociByTag(param('tag'), true); 
-      } else if (param('show')){
-        map.showLocusById(param('show'));
-      }
+    if (param('tag')) {
+      // Second argument is optional boolean to automatically open 
+      // info windows containing the content for each marker
+      map.showLociByTag('sometag', true); 
+    } else if (param('show')){
+      map.showLocusById('someID');
     }

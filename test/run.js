@@ -2,7 +2,8 @@ var map;
 
 function loadMap() {
   map = new locust.Map({
-    locus_info : locus_info
+    canvasID   : 'map_canvas',
+    locusInfo  : locus_info
   });
 
   if (param('tag')) {

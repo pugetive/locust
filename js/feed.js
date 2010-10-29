@@ -6,7 +6,7 @@ var locus_info =
     latitude  : 47.62074,
     longitude : -122.349308,
     tags      : ['seattle center'],
-    content   : 'Space Needle: the greatest example of retro-futurism in the history of the world.'
+    content   : "Space Needle: Seattle's gift to retro-futurism."
   },
   {
     id        : '2',
@@ -14,7 +14,7 @@ var locus_info =
     latitude  : 47.621283,
     longitude : -122.348514,
     tags      : ['music', 'seattle center'],
-    content   : 'EPM is an architectural blob with a monorail and some Replacements memorabilia.'
+    content   : 'EMP: an architectural blob with a monorail and some Replacements memorabilia.'
     },
   {
     id        : '3',
@@ -29,6 +29,6 @@ var locus_info =
     latitude  : 47.675988,
     longitude : -122.372604,
     tags      : ['music', 'ballard'],
-    content   : "1127: Home of live music, web software, and whacky shenanigans."
+    content   : "1127: Home of live music, web software, and intermittent shenanigans."
   }
 ];
