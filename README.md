@@ -1,33 +1,48 @@
 Locust
 ------
 
-Locust is not written yet.
+Locust is still a grasshopper.
 
 Basics
 ------
 
-      <!DOCTYPE html>
-      <html>
-      <head>
-      <style type="text/css">
-        html { height: 100% }
-        body { height: 100%; margin: 0px; padding: 0px }
-        #map_canvas { height: 100% }
-      </style>
-      <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
-      <script src="locust.js" type="text/javascript" charset="utf-8"></script>
+After including the Google Maps JavaScript library and locust.js:
 
-      <script type="text/javascript" charset="utf-8">
-        function loadMap() {
-          new locust.Map({
-            latitude: 47.675988,
-            longitude: -122.372604
-          });
-        }
-      </script>
+Build, fetch, or include a JSON feed:
 
-      </head>
-      <body onload="loadMap()">
-        <div id="map_canvas" style="width:100%; height:100%"></div>
-      </body>
-      </html>
+    var locus_info = 
+    [
+      {
+        id        : '1',
+        name      : "Space Needle",
+        latitude  : 47.62074,
+        longitude : -122.349308,
+        tags      : ['tourist'],
+        content   : 'Space Needle: a shining example of retro-futurism.'
+      },
+      {
+        id        : '2',
+        name      : 'EMP',
+        latitude  : 47.621283,
+        longitude : -122.348514,
+        tags      : ['tourist', 'music'],
+        content   : 'EPM: an architectural blob featuring a monorail and some Replacements memorabilia.'
+      },
+      ...etc...
+    ];
+
+Then construct a Map object and show markers by tag or ID:
+
+    function loadMap() {
+      map = new locust.Map({
+        locus_info : locus_info
+      });
+
+      if (param('tag')) {
+        // Second argument is optional boolean to automatically open info windows
+        // for each marker
+        map.showLociByTag(param('tag'), true); 
+      } else if (param('show')){
+        map.showLocusById(param('show'));
+      }
+    }

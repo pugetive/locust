@@ -170,7 +170,7 @@ locust.Map.prototype.getLociByTag = function(tag) {
   var matches = [];
   for (i = 0; i < this.loci.length; ++i){
     var locus = this.loci[i];
-    var tags = locus.tags.split(',');
+    var tags = locus.tags;
     if (tag in oc(tags)){
       matches.push(locus)
     }

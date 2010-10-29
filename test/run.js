@@ -21,5 +21,5 @@ function param( name ) {
   if( results == null )
     return "";
   else
-    return results[1];
+    return decodeURI(results[1]);
 }
