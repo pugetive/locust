@@ -10,7 +10,7 @@ After including the Google Maps JavaScript library and locust.js:
 
 Build, fetch, or include a JSON feed:
 
-    var locus_info = 
+    var marker_info = 
     [
       {
         id        : '1',
@@ -34,14 +34,14 @@ Build, fetch, or include a JSON feed:
 Then construct a Map object and show markers by tag or ID (this assumes you're grabbing query variables with a "param" function):
 
     map = new locust.Map({
-      canvasID  : 'target-element-id',
-      locusInfo : locus_info
+      canvasID   : 'target-element-id',
+      markerInfo : marker_info
     });
 
     if (param('tag')) {
       // Second argument is optional boolean to automatically open 
       // info windows containing the content for each marker
-      map.showLociByTag(param('tag'), true); 
+      map.showMarkersByTag(param('tag'), true); 
     } else if (param('show')){
-      map.showLocusById(param('show'));
+      map.showMarkerById(param('show'));
     }

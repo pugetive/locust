@@ -29,10 +29,10 @@ THE SOFTWARE.
 Classes and methods:
 
   Map
-    .showLocusById(id)
-    .getLocusById(id)
-    .showLociByTag(tag, <show_info_window:bool>)
-    .getLociByTag(tag)
+    .showMarkerById(id)
+    .getMarkerById(id)
+    .showMarkerByTag(tag, <show_info_window:bool>)
+    .getMarkerByTag(tag)
     
   Marker
     .show()
@@ -59,9 +59,9 @@ locust  = {
 */
 
 locust.Marker = function(options) {
-  this.name      = "Unnamed Location";
-  this.latitude  =   47.62074;
-  this.longitude = -122.349308;
+  this.name           = "Unnamed Location";
+  this.latitude       =   47.62074;  // space
+  this.longitude      = -122.349308; // needle
 
   // Replace the defaults with any passed in parameters;
   for (var n in options) { this[n] = arguments[0][n]; }
@@ -109,23 +109,25 @@ locust.Marker.prototype.showInfoWindow = function() {
 locust.Map = function(options) {
   var m = this;
 
-  m.center    = new locust.Marker();
-  m.zoomLevel = 17;
-  m.mapType   = 'roadmap'; // ['roadmap', 'satellite', 'hybrid']
-  m.locusInfo = [];
-  m.loci      = [];
-  m.canvasID  = 'map_canvas';
+  m.center     = new locust.Marker();
+  m.zoomLevel  = 17;
+  m.mapType    = 'roadmap'; // ['roadmap', 'satellite', 'hybrid']
+  m.markerInfo = [];
+  m.markers    = [];
+  m.canvasID   = 'map_canvas';
+
+  this.mapTypeControl = true;
 
   // Replace the defaults with any passed in parameters;
   for (var n in options) { this[n] = arguments[0][n]; }
 
   m.initialize();  
 
-  for(i = 0; i < m.locusInfo.length; ++i){
-    var locus = new locust.Marker(m.locusInfo[i])
+  for(i = 0; i < m.markerInfo.length; ++i){
+    var locus = new locust.Marker(m.markerInfo[i])
     locus.map = m.map;
 
-    m.loci.push(locus);
+    m.markers.push(locus);
   }
 }
 
@@ -133,16 +135,17 @@ locust.Map = function(options) {
 locust.Map.prototype.initialize = function() {
   var latlng = new google.maps.LatLng(this.center.latitude, this.center.longitude);
   var myOptions = {
-    zoom      : this.zoomLevel,
-    center    : latlng,
-    mapTypeId : this.mapType
+    zoom           : this.zoomLevel,
+    center         : latlng,
+    mapTypeId      : this.mapType,
+    mapTypeControl : this.mapTypeControl
   };
   this.map = new google.maps.Map(document.getElementById(this.canvasID), myOptions);
 }
 
 
-locust.Map.prototype.showLocusById = function(id) {
-  var locus = this.getLocusById(id);
+locust.Map.prototype.showMarkerById = function(id) {
+  var locus = this.getMarkerById(id);
   if (locus){
     this.map.center = new google.maps.LatLng(locus.latitude, locus.longitude)
     locus.show();
@@ -151,35 +154,54 @@ locust.Map.prototype.showLocusById = function(id) {
 }
 
 
-locust.Map.prototype.getLocusById = function(id){
-  for(i = 0; i < this.loci.length; ++i){
-    if (this.loci[i].id == id){
-      return this.loci[i];
+locust.Map.prototype.getMarkerById = function(id){
+  for(i = 0; i < this.markers.length; ++i){
+    if (this.markers[i].id == id){
+      return this.markers[i];
     }
   }
   return false;
 }
 
 
-locust.Map.prototype.showLociByTag = function(tag, open_info_window){
-  var loci = this.getLociByTag(tag);
+locust.Map.prototype.getTagsWithMarkers = function() {
+  var markers = this.markers
+  var tags = {}
+  
+  for(i = 0; i < markers.length; ++i){
+    var locus = markers[i];
+    var locus_tags = locus.tags;
+    for(j = 0; j < locus_tags.length; ++j){
+      var this_tag = locus_tags[j];
+      if (tags[this_tag]){
+      } else {
+        tags[this_tag] = []
+      }
+      tags[this_tag].push(locus)
+    }
+  }
+  return tags;
+}
+
+locust.Map.prototype.showMarkersByTag = function(tag, open_info_window){
+  var markers = this.getMarkersByTag(tag);
   var bounds = new google.maps.LatLngBounds();
 
-  for(i = 0; i < loci.length; ++i){
-    loci[i].show();
-    bounds.extend(loci[i].latLng);
+  for(i = 0; i < markers.length; ++i){
+    markers[i].show();
+    bounds.extend(markers[i].latLng);
     if (open_info_window){
-      loci[i].showInfoWindow();
+      markers[i].showInfoWindow();
     }
   }
   this.map.fitBounds(bounds);
 }
 
 
-locust.Map.prototype.getLociByTag = function(tag) {
+locust.Map.prototype.getMarkersByTag = function(tag) {
   var matches = [];
-  for (i = 0; i < this.loci.length; ++i){
-    var locus = this.loci[i];
+  for (i = 0; i < this.markers.length; ++i){
+    var locus = this.markers[i];
     var tags = locus.tags;
     if (tag in oc(tags)){
       matches.push(locus)

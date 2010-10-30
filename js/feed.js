@@ -1,4 +1,4 @@
-var locus_info = 
+var marker_info = 
 [
   {
     id        : '1',

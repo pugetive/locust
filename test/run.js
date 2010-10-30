@@ -3,13 +3,13 @@ var map;
 function loadMap() {
   map = new locust.Map({
     canvasID   : 'map_canvas',
-    locusInfo  : locus_info
+    markerInfo  : marker_info
   });
 
   if (param('tag')) {
-    map.showLociByTag(param('tag'), true);
+    map.showMarkersByTag(param('tag'), true);
   } else if (param('show')){
-    map.showLocusById(param('show'));
+    map.showMarkerById(param('show'));
   }
 }
 
