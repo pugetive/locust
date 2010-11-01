@@ -31,8 +31,8 @@ Classes and methods:
   Map
     .showMarkerById(id)
     .getMarkerById(id)
-    .showMarkerByTag(tag, <show_info_window:bool>)
-    .getMarkerByTag(tag)
+    .showMarkersByTag(tag, <show_info_window:bool>)
+    .getMarkersByTag(tag)
     
   Marker
     .show()
@@ -41,7 +41,6 @@ Example data feed in js/feed.js
 
 -------------------------------------------------------------------------------- 
 */
-
 
 locust  = {
   Map    : function() {},
@@ -59,14 +58,15 @@ locust  = {
 */
 
 locust.Marker = function(options) {
-  this.name           = "Unnamed Location";
-  this.latitude       =   47.62074;  // space
-  this.longitude      = -122.349308; // needle
+  this.name      = "Space Needle";
+  this.latitude  =   47.62074;  // space
+  this.longitude = -122.349308; // needle
+  this.marker    = null;
 
   // Replace the defaults with any passed in parameters;
   for (var n in options) { this[n] = arguments[0][n]; }
 
-  this.latLng    = new google.maps.LatLng(this.latitude, this.longitude);
+  this.latLng     = new google.maps.LatLng(this.latitude, this.longitude);
   this.infowindow = new google.maps.InfoWindow({
       content: this.content
   });
@@ -77,16 +77,22 @@ locust.Marker = function(options) {
 locust.Marker.prototype.show = function() {
   var locus = this;
 
-  // var pointer_image = 'http://dev.todd.com/google_maps/images/flash.png'
-  var marker = new google.maps.Marker({
-    position: new google.maps.LatLng(locus.latitude, locus.longitude), 
-    map   : locus.map, 
-    title : locus.name,
-    // icon  : pointer_image
-  });
+  if (locus.marker){
+    locus.marker.setMap(locus.map);
+  } else {
+    // var pointer_image = 'http://dev.todd.com/google_maps/images/flash.png'
+    var marker = new google.maps.Marker({
+      position: new google.maps.LatLng(locus.latitude, locus.longitude), 
+      map   : locus.map, 
+      title : locus.name,
+      // icon  : pointer_image
+    });
+    locus.marker = marker;
+  }
 
-  locus.marker = marker;
-  google.maps.event.addListener(marker, 'click', function() {
+  // locus.map.visible_markers.push(locus);
+
+  google.maps.event.addListener(locus.marker, 'click', function() {
     locus.showInfoWindow();
   });
 }
@@ -109,12 +115,13 @@ locust.Marker.prototype.showInfoWindow = function() {
 locust.Map = function(options) {
   var m = this;
 
-  m.center     = new locust.Marker();
-  m.zoomLevel  = 17;
-  m.mapType    = 'roadmap'; // ['roadmap', 'satellite', 'hybrid']
-  m.markerInfo = [];
-  m.markers    = [];
-  m.canvasID   = 'map_canvas';
+  m.center          = new locust.Marker();
+  m.zoomLevel       = 17;
+  m.mapType         = 'roadmap'; // ['roadmap', 'satellite', 'hybrid']
+  m.markerInfo      = [];
+  m.markers         = [];
+  m.canvasID        = 'map_canvas';
+  m.visible_markers = [];
 
   this.mapTypeControl = true;
 
@@ -146,11 +153,16 @@ locust.Map.prototype.initialize = function() {
 
 locust.Map.prototype.showMarkerById = function(id) {
   var locus = this.getMarkerById(id);
+  var bounds = new google.maps.LatLngBounds();
+
   if (locus){
-    this.map.center = new google.maps.LatLng(locus.latitude, locus.longitude)
+    this.map.setCenter(new google.maps.LatLng(locus.latitude, locus.longitude));
+    this.map.setZoom(17);
+    bounds.extend(locus.latLng);
     locus.show();
-    return
+    locus.showInfoWindow();
   }
+  this.map.fitBounds(bounds);
 }
 
 
@@ -210,7 +222,14 @@ locust.Map.prototype.getMarkersByTag = function(tag) {
   return matches;
 }
 
-
+locust.Map.prototype.clearMarkers = function() {
+  for(var i in this.markers){
+    var m = this.markers[i].marker;
+    if (m){
+      m.setMap(null);
+    }
+  }
+}
 
 
 

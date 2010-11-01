@@ -26,9 +26,10 @@ var marker_info =
   },
   {
     id        : '4',
-    latitude  : 47.675988,
-    longitude : -122.372604,
-    tags      : ['music', 'ballard'],
+    name      : 'Showbox at the Marker',
+    latitude  : 47.608387,
+    longitude : -122.339212,
+    tags      : ['music', 'downtown'],
     content   : "1127: Home of live music, web software, and intermittent shenanigans."
   }
 ];
