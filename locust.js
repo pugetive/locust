@@ -67,6 +67,9 @@ locust.Marker = function(options) {
   for (var n in options) { this[n] = arguments[0][n]; }
 
   this.latLng     = new google.maps.LatLng(this.latitude, this.longitude);
+  if (!this.zoom){
+    this.zoom = 17;
+  }
 
   // var info_window = $('<div>');
   // info_window.addClass('marker-info');
@@ -224,7 +227,12 @@ locust.Map.prototype.showMarkersByTag = function(tag, open_info_window){
       markers[i].showInfoWindow();
     }
   }
-  this.map.fitBounds(bounds);
+  if (markers.length > 1){
+    this.map.fitBounds(bounds);
+  } else {
+    this.map.setCenter(new google.maps.LatLng(markers[0].latitude, markers[0].longitude));
+    this.map.setZoom(markers[0].zoom);
+  }
 }
 
 
