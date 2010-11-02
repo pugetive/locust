@@ -1,14 +1,14 @@
 Locust
 ------
 
-Locust is still a grasshopper.
+Locust is still a grasshopper.  It's being abstracted from a custom map project currently under development.
 
 Basics
 ------
 
 After including the Google Maps JavaScript library and locust.js:
 
-Build, fetch, or include a JSON feed:
+Build, fetch, or include a JSON feed of marker details.  Note that we assign an ID and some tags to each marker.
 
     var marker_info = 
     [

@@ -59,16 +59,25 @@ locust  = {
 
 locust.Marker = function(options) {
   this.name      = "Space Needle";
-  this.latitude  =   47.62074;  // space
-  this.longitude = -122.349308; // needle
+  this.latitude  =   47.62074; 
+  this.longitude = -122.349308;
   this.marker    = null;
 
   // Replace the defaults with any passed in parameters;
   for (var n in options) { this[n] = arguments[0][n]; }
 
   this.latLng     = new google.maps.LatLng(this.latitude, this.longitude);
+
+  // var info_window = $('<div>');
+  // info_window.addClass('marker-info');
+  // 
+  // var marker_image = $('<img />');
+  // marker_image.attr('src', 'http://media.svennerberg.com/2009/09/bgma3-70.png');
+  // info_window.append(marker_image);
+  // info_window.append(this.content);
+  // 
   this.infowindow = new google.maps.InfoWindow({
-      content: this.content
+    content: this.content
   });
 
 }
@@ -90,15 +99,19 @@ locust.Marker.prototype.show = function() {
     locus.marker = marker;
   }
 
-  // locus.map.visible_markers.push(locus);
 
   google.maps.event.addListener(locus.marker, 'click', function() {
     locus.showInfoWindow();
   });
 }
 
+
 locust.Marker.prototype.showInfoWindow = function() {
   this.infowindow.open(this.map, this.marker);
+}
+
+locust.Marker.prototype.hideInfoWindow = function() {
+  this.infowindow.close(this.map, this.marker);  
 }
 
 
@@ -121,7 +134,7 @@ locust.Map = function(options) {
   m.markerInfo      = [];
   m.markers         = [];
   m.canvasID        = 'map_canvas';
-  m.visible_markers = [];
+  m.markerInfoClass = 'marker-info';
 
   this.mapTypeControl = true;
 
@@ -162,7 +175,11 @@ locust.Map.prototype.showMarkerById = function(id) {
     locus.show();
     locus.showInfoWindow();
   }
-  this.map.fitBounds(bounds);
+  if (locus.zoom){
+    this.map.setZoom(locus.zoom);
+  } else {
+    this.map.fitBounds(bounds);
+  }
 }
 
 
@@ -195,6 +212,7 @@ locust.Map.prototype.getTagsWithMarkers = function() {
   return tags;
 }
 
+
 locust.Map.prototype.showMarkersByTag = function(tag, open_info_window){
   var markers = this.getMarkersByTag(tag);
   var bounds = new google.maps.LatLngBounds();
@@ -222,8 +240,10 @@ locust.Map.prototype.getMarkersByTag = function(tag) {
   return matches;
 }
 
+
 locust.Map.prototype.clearMarkers = function() {
   for(var i in this.markers){
+    this.markers[i].hideInfoWindow();
     var m = this.markers[i].marker;
     if (m){
       m.setMap(null);
