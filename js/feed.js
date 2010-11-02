@@ -33,7 +33,7 @@ var marker_info =
     latitude  : 47.608387,
     longitude : -122.339212,
     tags      : ['music', 'downtown'],
-    content   : "1127: Home of live music, web software, and intermittent shenanigans.",
+    content   : "Former comedy club now a mid-sized music venue.",
     zoom      : 17
   }
 ];
