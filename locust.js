@@ -66,7 +66,7 @@ locust.Marker = function(options) {
   // Replace the defaults with any passed in parameters;
   for (var n in options) { this[n] = arguments[0][n]; }
 
-  this.latLng     = new google.maps.LatLng(this.latitude, this.longitude);
+  this.latLng = new google.maps.LatLng(this.latitude, this.longitude);
   if (!this.zoom){
     this.zoom = 17;
   }
@@ -85,6 +85,14 @@ locust.Marker = function(options) {
 
 }
 
+
+
+/**
+*  Pin a marker to the map and make it clickable.
+*  NOTE: this does not alter the placement or zoom of the map.
+* @param none
+* @return null
+*/
 
 locust.Marker.prototype.show = function() {
   var locus = this;
@@ -128,6 +136,13 @@ locust.Marker.prototype.hideInfoWindow = function() {
 -------------------------------------------------------------------------------- 
 */
 
+
+/**
+* locust.Map contructor - constructs and initializes map.
+* @param Array options
+* @return null
+*/
+
 locust.Map = function(options) {
   var m = this;
 
@@ -154,6 +169,11 @@ locust.Map = function(options) {
   }
 }
 
+/**
+* Display the map on screen 
+* @param none
+* @return null
+*/
 
 locust.Map.prototype.initialize = function() {
   var latlng = new google.maps.LatLng(this.center.latitude, this.center.longitude);
@@ -167,24 +187,31 @@ locust.Map.prototype.initialize = function() {
 }
 
 
+/**
+* Recenter map to the given marker, and zoom as necessary. 
+* @param String marker_id : Unique identifier for the marker
+* @return null
+*/
+
 locust.Map.prototype.showMarkerById = function(id) {
   var locus = this.getMarkerById(id);
-  var bounds = new google.maps.LatLngBounds();
 
   if (locus){
-    this.map.setCenter(new google.maps.LatLng(locus.latitude, locus.longitude));
-    this.map.setZoom(17);
-    bounds.extend(locus.latLng);
+    this.map.panTo(locus.latLng);
     locus.show();
     locus.showInfoWindow();
   }
   if (locus.zoom){
-    this.map.setZoom(locus.zoom);
-  } else {
-    this.map.fitBounds(bounds);
+     this.conditionalZoom(locus.zoom);
   }
 }
 
+
+/**
+* Retuns the marker object corresponding to the given unique ID 
+* @param String id 
+* @return locust.Marker or <false>
+*/
 
 locust.Map.prototype.getMarkerById = function(id){
   for(i = 0; i < this.markers.length; ++i){
@@ -195,6 +222,13 @@ locust.Map.prototype.getMarkerById = function(id){
   return false;
 }
 
+/**
+* Returns an array of arrays, first level containing all 
+* the tags culled from the original JSON feed, second level
+* containing all hte markers associated with each tag. 
+* @param none
+* @return Array of Arrays ["tag" : [locust.Marker, locust.Marker]}
+*/
 
 locust.Map.prototype.getTagsWithMarkers = function() {
   var markers = this.markers
@@ -216,6 +250,29 @@ locust.Map.prototype.getTagsWithMarkers = function() {
 }
 
 
+/**
+* Returns all tags culled from the source JSON feed info. 
+* @param none
+* @return Array tags : An array of strings
+*/
+
+locust.Map.prototype.getTags = function() {
+  var tags_with_markers = this.getTagsWithMarkers();
+  var tags = []
+  for(tag in tags_with_markers){
+    tags.push(tag);
+  }
+  return tags.sort();
+}
+
+/**
+* Displays all markers associated with a given tag, adjusts map bounds
+* to encompass them all, and optionally opens their info windows 
+* @param String tag 
+* @param Boolean open_info_window
+* @return null
+*/
+
 locust.Map.prototype.showMarkersByTag = function(tag, open_info_window){
   var markers = this.getMarkersByTag(tag);
   var bounds = new google.maps.LatLngBounds();
@@ -229,12 +286,17 @@ locust.Map.prototype.showMarkersByTag = function(tag, open_info_window){
   }
   if (markers.length > 1){
     this.map.fitBounds(bounds);
-  } else {
-    this.map.setCenter(new google.maps.LatLng(markers[0].latitude, markers[0].longitude));
-    this.map.setZoom(markers[0].zoom);
+  } else if (markers[0]){
+    this.map.panTo(markers[0].latLng);
+    this.conditionalZoom(markers[0].zoom);
   }
 }
 
+/**
+* Returns all Markers associated with a given tag. 
+* @param String tag
+* @return Array of locust.Marker objects
+*/
 
 locust.Map.prototype.getMarkersByTag = function(tag) {
   var matches = [];
@@ -248,6 +310,10 @@ locust.Map.prototype.getMarkersByTag = function(tag) {
   return matches;
 }
 
+/**
+* Clears all visible markers and info windows 
+* @return null
+*/
 
 locust.Map.prototype.clearMarkers = function() {
   for(var i in this.markers){
@@ -259,7 +325,19 @@ locust.Map.prototype.clearMarkers = function() {
   }
 }
 
+/**
+* Resets the zoom level of the map only if it is at least 2 levels  
+* different from current
+*
+* @param integer zoom_level The target level to set, if applicable
+* @return null
+*/
 
+locust.Map.prototype.conditionalZoom = function(zoom_level) {
+  if (Math.abs(zoom_level - this.map.getZoom()) > 2){
+    this.map.setZoom(zoom_level);
+  }  
+}
 
 /**
 -------------------------------------------------------------------------------- 
