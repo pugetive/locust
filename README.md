@@ -52,10 +52,11 @@ Then construct a Map object and show markers by tag or ID (this assumes you're g
 
     }
 
-To pin a marker at the top left corner of each map tile (making handy screenshots for custom tiling), set markTileCorners:
+To pin a marker at the top left corner of each map tile (making handy screenshots for custom tiling), set markTileCorners. A custom marker image to delineate corners is included, but the client must set its directory prefix with tileMarkerPath:
 
     map = new locust.Map({
       markerInfo      : marker_info,
       markTileCorners : true,
+      tileMarkerPath  : 'http://example.com/images',
       tileSize        : 512          // default is 256
     });
