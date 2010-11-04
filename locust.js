@@ -156,6 +156,8 @@ locust.Map = function(options) {
   m.markTileCorners = false;
   m.tileMarkers     = [];
   m.tileSize        = 256;
+  m.tileMarkerImage = 'tile-corner-marker.png';
+  m.tileMarkerPath  = null; // Must be set to reference the client's image directory
   
   this.mapTypeControl = true;
 
@@ -187,6 +189,16 @@ locust.Map = function(options) {
 
 locust.Map.prototype.initialize = function() {
   var locust_map = this;
+
+  var tile_marker = null;
+  if (locust_map.tileMarkerPath && locust_map.tileMarkerImage){
+    var path_separator = '/';
+    if (locust_map.tileMarkerPath.substr(-1, 1) == '/'){
+      path_separator = '';
+    }
+    tile_marker = new google.maps.MarkerImage(locust_map.tileMarkerPath + path_separator + locust_map.tileMarkerImage, null, null, new google.maps.Point(10, 10))
+  }
+
   var image_map_type = new google.maps.ImageMapType({
     getTileUrl: function(coord, zoom) {
       if (locust_map.markTileCorners){
@@ -195,11 +207,12 @@ locust.Map.prototype.initialize = function() {
         var tile_point = new google.maps.Point(coord.x * tile_size / zfactor, coord.y * tile_size / zfactor);
         var tile_latlng = locust_map.map.getProjection().fromPointToLatLng(tile_point);
 
+
         var marker = new google.maps.Marker({
           position: tile_latlng, 
           map: locust_map.map, 
           title: "Tile at:" + coord,
-          icon: marker
+          icon: tile_marker
         });
         locust_map.tileMarkers.push(marker);
       }
