@@ -51,3 +51,11 @@ Then construct a Map object and show markers by tag or ID (this assumes you're g
       map.showMarkerById(param('show'));
 
     }
+
+To automatically set a marker at the top left of each map tile (very handy for creating custom overlays), set markTileCorners:
+
+    map = new locust.Map({
+      canvasID        : 'target-element-id', // defaults to "map-canvas"
+      markerInfo      : marker_info,
+      markTileCorners : true
+    });

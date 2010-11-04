@@ -58,10 +58,10 @@ locust  = {
 */
 
 locust.Marker = function(options) {
-  this.name      = "Space Needle";
-  this.latitude  =   47.62074; 
-  this.longitude = -122.349308;
-  this.marker    = null;
+  this.name            = "Space Needle";
+  this.latitude        =   47.62074; 
+  this.longitude       = -122.349308;
+  this.marker          = null;
 
   // Replace the defaults with any passed in parameters;
   for (var n in options) { this[n] = arguments[0][n]; }
@@ -102,9 +102,9 @@ locust.Marker.prototype.show = function() {
   } else {
     // var pointer_image = 'http://dev.todd.com/google_maps/images/flash.png'
     var marker = new google.maps.Marker({
-      position: new google.maps.LatLng(locus.latitude, locus.longitude), 
-      map   : locus.map, 
-      title : locus.name,
+      position : new google.maps.LatLng(locus.latitude, locus.longitude), 
+      map      : locus.map, 
+      title    : locus.name,
       // icon  : pointer_image
     });
     locus.marker = marker;
@@ -153,13 +153,23 @@ locust.Map = function(options) {
   m.markers         = [];
   m.canvasID        = 'map_canvas';
   m.markerInfoClass = 'marker-info';
-
+  m.markTileCorners = false;
+  m.tileMarkers     = [];
+  m.tileSize        = 256;
+  
   this.mapTypeControl = true;
 
   // Replace the defaults with any passed in parameters;
   for (var n in options) { this[n] = arguments[0][n]; }
 
   m.initialize();  
+
+  if (m.markTileCorners){
+    google.maps.event.addListener(this.map, 'zoom_changed', function() {
+      m.clearTileMarkers();
+    });
+  }
+
 
   for(i = 0; i < m.markerInfo.length; ++i){
     var locus = new locust.Marker(m.markerInfo[i])
@@ -176,6 +186,29 @@ locust.Map = function(options) {
 */
 
 locust.Map.prototype.initialize = function() {
+  var locust_map = this;
+  var image_map_type = new google.maps.ImageMapType({
+    getTileUrl: function(coord, zoom) {
+      if (locust_map.markTileCorners){
+        var tile_size = locust_map.tileSize;
+        var zfactor=Math.pow(2, zoom);
+        var tile_point = new google.maps.Point(coord.x * tile_size / zfactor, coord.y * tile_size / zfactor);
+        var tile_latlng = locust_map.map.getProjection().fromPointToLatLng(tile_point);
+
+        var marker = new google.maps.Marker({
+          position: tile_latlng, 
+          map: locust_map.map, 
+          title: "Tile at:" + coord,
+          icon: marker
+        });
+        locust_map.tileMarkers.push(marker);
+      }
+    },
+    tileSize: new google.maps.Size(this.tileSize, this.tileSize),
+    isPng: true
+  });
+
+
   var latlng = new google.maps.LatLng(this.center.latitude, this.center.longitude);
   var myOptions = {
     zoom           : this.zoomLevel,
@@ -183,7 +216,11 @@ locust.Map.prototype.initialize = function() {
     mapTypeId      : this.mapType,
     mapTypeControl : this.mapTypeControl
   };
+
   this.map = new google.maps.Map(document.getElementById(this.canvasID), myOptions);
+  this.map.overlayMapTypes.insertAt(0, image_map_type);
+
+
 }
 
 
@@ -337,6 +374,15 @@ locust.Map.prototype.conditionalZoom = function(zoom_level) {
   if (Math.abs(zoom_level - this.map.getZoom()) > 2){
     this.map.setZoom(zoom_level);
   }  
+}
+
+locust.Map.prototype.clearTileMarkers = function() {
+  for(var i in this.tileMarkers){
+    var m = this.tileMarkers[i];
+    if (m){
+      m.setMap(null);
+    }
+  }
 }
 
 /**
