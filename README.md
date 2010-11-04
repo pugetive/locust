@@ -52,10 +52,10 @@ Then construct a Map object and show markers by tag or ID (this assumes you're g
 
     }
 
-To automatically set a marker at the top left of each map tile (very handy for creating custom overlays), set markTileCorners:
+To pin a marker at the top left corner of each map tile (making handy screenshots for custom tiling), set markTileCorners:
 
     map = new locust.Map({
-      canvasID        : 'target-element-id', // defaults to "map-canvas"
       markerInfo      : marker_info,
-      markTileCorners : true
+      markTileCorners : true,
+      tileSize        : 512          // default is 256
     });
