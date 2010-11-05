@@ -64,6 +64,8 @@ locust.Marker = function(options) {
   // Replace the defaults with any passed in parameters;
   for (var n in options) { this[n] = arguments[0][n]; }
 
+  this.dashed_name = dashed_string(this.name);
+
   if (typeof(this.tags) == 'string'){
     this.tags = [this.tags];
   }
@@ -184,7 +186,7 @@ locust.Map = function(options) {
 
 
   for(i = 0; i < m.markerInfo.length; ++i){
-    if (m.alternateIdKey){
+    if (m.alternateIdKey){  
       m.markerInfo[i].id = m.markerInfo[i][m.alternateIdKey];
     }
     if (m.alternateContentKey){
@@ -277,7 +279,7 @@ locust.Map.prototype.showMarkerById = function(id) {
 
 
 /**
-* Retuns the marker object corresponding to the given unique ID 
+* Returns the marker object corresponding to the given unique ID 
 * @param String id 
 * @return locust.Marker or <false>
 */
@@ -290,6 +292,26 @@ locust.Map.prototype.getMarkerById = function(id){
   }
   return false;
 }
+
+
+/**
+* Returns the marker object matching the given encoded name
+* @param String url-string
+* @return Marker name description
+*/
+locust.Map.prototype.getMarkerByDashedName = function(dashed_string){
+  for(i = 0; i < this.markers.length; ++i){
+    if (this.markers[i].dashed_name == dashed_string){
+      return this.markers[i];
+    }
+  }
+  return false;
+}
+
+locust.Map.prototype.showMarkerByDashedName = function(dashed_string){
+  this.showMarkerById(this.getMarkerByDashedName(dashed_string).id)
+}
+
 
 /**
 * Returns an array of arrays, first level containing all 
@@ -431,4 +453,10 @@ function oc(a)
     o[a[i]]='';
   }
   return o;
+}
+
+function dashed_string(text){
+  if (text){
+    return text.toLowerCase().replace(/ /g, '-')
+  }
 }
