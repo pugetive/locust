@@ -66,6 +66,10 @@ locust.Marker = function(options) {
   // Replace the defaults with any passed in parameters;
   for (var n in options) { this[n] = arguments[0][n]; }
 
+  if (typeof(this.tags) == 'string'){
+    this.tags = [this.tags];
+  }
+
   this.latLng = new google.maps.LatLng(this.latitude, this.longitude);
   if (!this.zoom){
     this.zoom = 17;
@@ -174,6 +178,12 @@ locust.Map = function(options) {
 
 
   for(i = 0; i < m.markerInfo.length; ++i){
+    if (m.alternateIdName){  
+      m.markerInfo[i].id = m.markerInfo[i][m.alternateIdName];
+    }
+    if (m.alternateContentName){
+      m.markerInfo[i].content = m.markerInfo[i][m.alternateContentName];
+    }
     var locus = new locust.Marker(m.markerInfo[i])
     locus.map = m.map;
 
@@ -291,7 +301,7 @@ locust.Map.prototype.getTagsWithMarkers = function() {
       var this_tag = locus_tags[j];
       if (tags[this_tag]){
       } else {
-        tags[this_tag] = []
+        tags[this_tag] = [];
       }
       tags[this_tag].push(locus)
     }
@@ -407,7 +417,7 @@ locust.Map.prototype.clearTileMarkers = function() {
 function oc(a)
 {
   var o = {};
-  for(var i=0;i<a.length;i++)
+  for(var i=0; i < a.length; i++)
   {
     o[a[i]]='';
   }
