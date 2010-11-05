@@ -58,9 +58,6 @@ locust  = {
 */
 
 locust.Marker = function(options) {
-  this.name            = "Space Needle";
-  this.latitude        =   47.62074; 
-  this.longitude       = -122.349308;
   this.marker          = null;
 
   // Replace the defaults with any passed in parameters;
@@ -178,11 +175,14 @@ locust.Map = function(options) {
 
 
   for(i = 0; i < m.markerInfo.length; ++i){
-    if (m.alternateIdName){  
-      m.markerInfo[i].id = m.markerInfo[i][m.alternateIdName];
+    if (m.alternateIdKey){
+      m.markerInfo[i].id = m.markerInfo[i][m.alternateIdKey];
     }
-    if (m.alternateContentName){
-      m.markerInfo[i].content = m.markerInfo[i][m.alternateContentName];
+    if (m.alternateContentKey){
+      m.markerInfo[i].content = m.markerInfo[i][m.alternateContentKey];
+    }
+    if (m.alternateNameKey){
+      m.markerInfo[i].name = m.markerInfo[i][m.alternateNameKey];
     }
     var locus = new locust.Marker(m.markerInfo[i])
     locus.map = m.map;
