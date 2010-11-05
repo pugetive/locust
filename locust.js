@@ -58,7 +58,8 @@ locust  = {
 */
 
 locust.Marker = function(options) {
-  this.marker          = null;
+  this.marker    = null;
+  this.thumbnail = null; //'http://media.svennerberg.com/2009/09/bgma3-70.png'
 
   // Replace the defaults with any passed in parameters;
   for (var n in options) { this[n] = arguments[0][n]; }
@@ -72,16 +73,24 @@ locust.Marker = function(options) {
     this.zoom = 17;
   }
 
-  // var info_window = $('<div>');
-  // info_window.addClass('marker-info');
-  // 
-  // var marker_image = $('<img />');
-  // marker_image.attr('src', 'http://media.svennerberg.com/2009/09/bgma3-70.png');
-  // info_window.append(marker_image);
-  // info_window.append(this.content);
-  // 
+  var info_window_content = '';
+  if (this.thumbnail){
+    var img_tag = '<img src="' + this.thumbnail + '" />';
+    info_window_content += '<div class="marker-image">' + img_tag + '</div>';
+  }
+  
+  info_window_content += '<div class="marker-text">'
+  info_window_content += '<div class="marker-title">' + this.name + '</div>';
+  info_window_content += '<div class="marker-body">' + this.content + '</div>';
+  if (this.website_url){
+    var a_tag = '<a href="' + this.website_url + '">Website</a>';
+    info_window_content += '<div class="marker-hotlink">' + a_tag + '</div>';
+  }
+  info_window_content += '</div>'
+
+
   this.infowindow = new google.maps.InfoWindow({
-    content: this.content
+    content: info_window_content
   });
 
 }
