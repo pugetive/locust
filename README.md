@@ -55,11 +55,11 @@ Then construct a Map object and show markers by tag or ID (this assumes you're g
 
 Linking to Markers
 ------------------
-Markers can be looked up by a URL-safe "dashed name" which Locust can match to the original string.  The marker for "Bob's Pizza Palace" might be reference online with:
+Markers can be looked up by a URL-safe "dashed name" which Locust can match to the original string.  The marker for "Merle's Country & Western Records" might be reference online with:
 
-    http://example.com/map/#/bobs-pizza-palace
+    http://example.com/map/#/merles-country-and-western-records
 
-...which might've been constructed like so:
+...which can be constructed like so:
 
     var url = 'http://example.com/map/#/' + locust_marker.dashedName;
 
