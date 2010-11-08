@@ -61,7 +61,7 @@ Markers can be looked up by a URL-safe "dashed name" which Locust can match to t
 
 ...which might've been constructed like so:
 
-   'http://example.com/map/#/' + locust_marker.dashedName;
+    var url = 'http://example.com/map/#/' + locust_marker.dashedName;
 
 ...and then direct links to display the marker and its info window could be handled like so:
 
