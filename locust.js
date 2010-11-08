@@ -64,7 +64,7 @@ locust.Marker = function(options) {
   // Replace the defaults with any passed in parameters;
   for (var n in options) { this[n] = arguments[0][n]; }
 
-  this.dashed_name = dashed_string(this.name);
+  this.dashedName = dashed_string(this.name);
 
   if (typeof(this.tags) == 'string'){
     this.tags = [this.tags];
@@ -301,7 +301,7 @@ locust.Map.prototype.getMarkerById = function(id){
 */
 locust.Map.prototype.getMarkerByDashedName = function(dashed_string){
   for(i = 0; i < this.markers.length; ++i){
-    if (this.markers[i].dashed_name == dashed_string){
+    if (this.markers[i].dashedName == dashed_string){
       return this.markers[i];
     }
   }
@@ -456,7 +456,22 @@ function oc(a)
 }
 
 function dashed_string(text){
-  if (text){
-    return text.toLowerCase().replace(/ /g, '-')
+  if (text == undefined) {
+    return '';
   }
+
+  var string_cleaning = {
+    '[\(\)]' : '',
+    "'"      : '',
+    '&#039;' : '',
+    '&amp;'  : 'and',
+    ' '      : '-'
+  };
+
+  var clean_text = text.toLowerCase();
+  for(key in string_cleaning) {
+    var regex = new RegExp(key, 'g');
+    clean_text = clean_text.replace(regex, string_cleaning[key]);
+  };
+  return clean_text;
 }
