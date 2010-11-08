@@ -35,7 +35,7 @@ Build, fetch, or include a JSON feed of marker details.  Note that we assign an 
 
 Then construct a Map object and show markers by tag or ID (this assumes you're grabbing query variables with a "param" function):
 
-    map = new locust.Map({
+    locust_map = new locust.Map({
       canvasID   : 'target-element-id', // defaults to "map-canvas"
       markerInfo : marker_info
     });
@@ -44,20 +44,36 @@ Then construct a Map object and show markers by tag or ID (this assumes you're g
 
       // Second argument is optional boolean to automatically open 
       // info windows containing the content for each marker
-      map.showMarkersByTag(param('tag'), true); 
+      locust_map.showMarkersByTag(param('tag'), true); 
 
     } else if (param('show')){
 
-      map.showMarkerById(param('show'));
+      locust_map.showMarkerById(param('show'));
 
     }
+
+
+Linking to Markers
+------------------
+Markers can be looked up by a URL-safe "dashed name" which Locust can match to the original string.  The marker for "Bob's Pizza Palace" might be reference online with:
+
+    http://example.com/map/#/bobs-pizza-palace
+
+...which might've been constructed like so:
+
+   'http://example.com/map/#/' + locust_marker.dashedName;
+
+...and then direct links to display the marker and its info window could be handled like so:
+
+    var target_marker = window.location.toString().split('#/')[1];
+    locust_map.showMarkerByDashedName(target_marker);
 
 Custom Tiling
 -------------
 
 To pin a marker at the top left corner of each map tile (making handy screenshots for custom tiling), set markTileCorners. A custom marker image to delineate corners is included, but the client must set its directory prefix with tileMarkerPath.  If markTileCorners is true but a tileMarkerPath is unspecified, the default marker pin will be used.
 
-    map = new locust.Map({
+    locust_map = new locust.Map({
       markerInfo      : marker_info,
       markTileCorners : true,
       tileMarkerPath  : 'http://example.com/images',
