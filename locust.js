@@ -184,22 +184,7 @@ locust.Map = function(options) {
     });
   }
 
-
-  for(i = 0; i < m.markerInfo.length; ++i){
-    if (m.alternateIdKey){  
-      m.markerInfo[i].id = m.markerInfo[i][m.alternateIdKey];
-    }
-    if (m.alternateContentKey){
-      m.markerInfo[i].content = m.markerInfo[i][m.alternateContentKey];
-    }
-    if (m.alternateNameKey){
-      m.markerInfo[i].name = m.markerInfo[i][m.alternateNameKey];
-    }
-    var locus = new locust.Marker(m.markerInfo[i])
-    locus.map = m.map;
-
-    m.markers.push(locus);
-  }
+  this._instantiateMarkers();
 }
 
 /**
@@ -211,37 +196,6 @@ locust.Map = function(options) {
 locust.Map.prototype.initialize = function() {
   var locust_map = this;
 
-  var tile_marker = null;
-  if (locust_map.tileMarkerPath && locust_map.tileMarkerImage){
-    var path_separator = '/';
-    if (locust_map.tileMarkerPath.substr(-1, 1) == '/'){
-      path_separator = '';
-    }
-    tile_marker = new google.maps.MarkerImage(locust_map.tileMarkerPath + path_separator + locust_map.tileMarkerImage, null, null, new google.maps.Point(10, 10))
-  }
-
-  var image_map_type = new google.maps.ImageMapType({
-    getTileUrl: function(coord, zoom) {
-      if (locust_map.markTileCorners){
-        var tile_size = locust_map.tileSize;
-        var zfactor=Math.pow(2, zoom);
-        var tile_point = new google.maps.Point(coord.x * tile_size / zfactor, coord.y * tile_size / zfactor);
-        var tile_latlng = locust_map.map.getProjection().fromPointToLatLng(tile_point);
-
-
-        var marker = new google.maps.Marker({
-          position: tile_latlng, 
-          map: locust_map.map, 
-          title: "Tile at:" + coord,
-          icon: tile_marker
-        });
-        locust_map.tileMarkers.push(marker);
-      }
-    },
-    tileSize: new google.maps.Size(this.tileSize, this.tileSize),
-    isPng: true
-  });
-
 
   var latlng = new google.maps.LatLng(this.center.latitude, this.center.longitude);
   var myOptions = {
@@ -252,9 +206,10 @@ locust.Map.prototype.initialize = function() {
   };
 
   this.map = new google.maps.Map(document.getElementById(this.canvasID), myOptions);
-  this.map.overlayMapTypes.insertAt(0, image_map_type);
-
-
+  if (this.markTileCorners){
+    this._setTileMarkers()
+  }
+  this._setCustomStyles();
 }
 
 
@@ -440,6 +395,136 @@ locust.Map.prototype.clearTileMarkers = function() {
 }
 
 /**
+* Reads the shortStyles data setting, rewrites in in long-form and sets teh custom styles. 
+* @param none
+* @return null
+*/
+
+locust.Map.prototype._setCustomStyles = function() {
+  if (this.shortStyles || this.greyscale){
+    var style_settings = []
+    if (this.shortStyles){
+      style_settings = this.shortStyles;
+    } else {
+      style_settings = [];
+    }
+    
+    if (this.greyscale){
+      var categories = ["administrative", "poi", "road", "transit", "water"];
+      for (var i in categories){
+        var setting = [categories[i], { saturation: -100 }]
+        style_settings.push(setting)
+      }
+    }
+
+    var massaged_settings = []
+    for(i in style_settings){
+      var setting = style_settings[i]
+      if (typeof(setting[1]) == 'string'){
+        element_type = setting[1];
+        styles_hash = setting[2];
+      } else {
+        element_type = 'all';
+        styles_hash = setting[1];
+      }
+
+      var stylers = [];
+      for (var key in styles_hash){
+        var s = {}
+        s[key] = styles_hash[key];
+        stylers.push(s)
+      }
+      var thing = {
+        featureType : setting[0],
+        elementType : element_type,
+        stylers     : stylers
+      }
+      massaged_settings.push(thing);
+    }
+    var styledMapOptions = {
+      name: "custom"
+    }
+
+    // console.log(massaged_settings)
+    var customMapType = new google.maps.StyledMapType(
+        massaged_settings, styledMapOptions);
+    
+    this.map.mapTypes.set('custom', customMapType);
+    this.map.setMapTypeId('custom');
+  }
+  
+}
+
+/**
+*  Adds a marker to the top left corner of each tile.
+* @param none
+* @return null
+*/
+
+locust.Map.prototype._setTileMarkers = function() {
+  var locust_map = this;
+  var tile_marker = null;
+  if (locust_map.tileMarkerPath && locust_map.tileMarkerImage){
+    var path_separator = '/';
+    if (locust_map.tileMarkerPath.substr(-1, 1) == '/'){
+      path_separator = '';
+    }
+    tile_marker = new google.maps.MarkerImage(locust_map.tileMarkerPath + path_separator + locust_map.tileMarkerImage, 
+                                              null, 
+                                              null, 
+                                              new google.maps.Point(10, 10))
+  }
+
+  var image_map_type = new google.maps.ImageMapType({
+    getTileUrl: function(coord, zoom) {
+      if (locust_map.markTileCorners){
+        var tile_size = locust_map.tileSize;
+        var zfactor=Math.pow(2, zoom);
+        var tile_point = new google.maps.Point(coord.x * tile_size / zfactor, coord.y * tile_size / zfactor);
+        var tile_latlng = locust_map.map.getProjection().fromPointToLatLng(tile_point);
+
+        var marker = new google.maps.Marker({
+          position: tile_latlng, 
+          map: locust_map.map, 
+          title: "Tile at:" + coord,
+          icon: tile_marker
+        });
+        locust_map.tileMarkers.push(marker);
+      }
+    },
+    tileSize: new google.maps.Size(this.tileSize, this.tileSize),
+    isPng: true
+  });
+  locust_map.map.overlayMapTypes.insertAt(0, image_map_type);
+  
+}
+
+/**
+* Instantiates locust.Marker objects from the JSON data and stores them in locust.Map.markers 
+* @param none
+* @return nil
+*/
+
+locust.Map.prototype._instantiateMarkers = function() {
+  var locust_map = this;
+  for(i = 0; i < locust_map.markerInfo.length; ++i){
+    if (locust_map.alternateIdKey){  
+      locust_map.markerInfo[i].id = locust_map.markerInfo[i][locust_map.alternateIdKey];
+    }
+    if (locust_map.alternateContentKey){
+      locust_map.markerInfo[i].content = locust_map.markerInfo[i][locust_map.alternateContentKey];
+    }
+    if (locust_map.alternateNameKey){
+      locust_map.markerInfo[i].name = locust_map.markerInfo[i][locust_map.alternateNameKey];
+    }
+    var locus = new locust.Marker(locust_map.markerInfo[i])
+    locus.map = locust_map.map;
+
+    locust_map.markers.push(locus);
+  }
+}
+
+/**
 -------------------------------------------------------------------------------- 
    Utilities
 -------------------------------------------------------------------------------- 
@@ -475,3 +560,4 @@ function dashed_string(text){
   };
   return clean_text;
 }
+

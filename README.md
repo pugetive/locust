@@ -68,6 +68,62 @@ Markers can be looked up by a URL-safe "dashed name" which Locust can match to t
     var target_marker = window.location.toString().split('#/')[1];
     locust_map.showMarkerByDashedName(target_marker);
 
+Custom Styling
+--------------
+Locust provides a shorter means of specifying custom styles via the shortStyles property.  You pass an array of specs in this format:
+    [<featureType>, <elementType: optional, defaults to "all">, <hash_of_stylers>]
+
+...and Locust rewrites them into the data structure Google expects:
+
+    var stylez = [
+        {
+          featureType: "road",
+          elementType: "geometry",
+          stylers: [
+            { visibility: "simplified" }
+          ]
+        },
+        {
+          featureType: "all",
+          elementType: "all",
+          stylers: [
+            { gamma: 2.0 }
+          ]
+        },
+        {
+          featureType: "administrative.land_parcel",
+          elementType: "all",
+          stylers: [
+            { visibility: "off" }
+          ]
+        },
+        {
+          featureType: "landscape.man_made",
+          elementType: "all",
+          stylers: [
+            { hue: "#330066" },
+            { saturation: 100 },
+            { lightness: -100 }
+          ]
+        }
+      ];
+
+
+As an example, here we are making a "clear blue sky" map by simplifying the display and tweaking its color:
+
+    locust_map.shortStyles = [["road", "geometry", { visibility : "simplified" }],
+                              ["administrative.land_parcel", { visibility : "off" }],
+                              ["all",  { hue        : '#87cefa', 
+                                         saturation : 100, 
+                                         lightness  : 25,
+                                         gamma      : 2.0 }]
+                              ];
+    
+
+For convenience, a "greyscale" property will automatically draw the map in black and white:
+
+    var map = new locust.Map({greyscale: true})
+
 Custom Tiling
 -------------
 
