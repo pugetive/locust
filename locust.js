@@ -33,6 +33,8 @@ Classes and methods:
     .getMarkerById(id)
     .showMarkersByTag(tag, <show_info_window:bool>)
     .getMarkersByTag(tag)
+    .showMarkerByDashedName(dashed_name)
+    .getMarkerByDashedName(dashed_name)
     
   Marker
     .show()
@@ -158,18 +160,23 @@ locust.Marker.prototype.hideInfoWindow = function() {
 locust.Map = function(options) {
   var m = this;
 
+  // Common settings
   m.center          = new locust.Marker();
   m.zoomLevel       = 17;
   m.mapType         = 'roadmap'; // ['roadmap', 'satellite', 'hybrid']
   m.markerInfo      = [];
-  m.markers         = [];
-  m.canvasID        = 'map_canvas';
-  m.markerInfoClass = 'marker-info';
+  m.canvasID        = 'map-canvas';
+
+  // Custom tiling
   m.markTileCorners = false;
-  m.tileMarkers     = [];
   m.tileSize        = 256;
   m.tileMarkerImage = 'tile-corner-marker.png';
   m.tileMarkerPath  = null; // Must be set to reference the client's image directory
+
+  m.greyscale       = false;
+
+  m.markers         = [];
+  m.tileMarkers     = [];
   
   this.mapTypeControl = true;
 
