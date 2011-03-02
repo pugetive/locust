@@ -118,7 +118,7 @@ locust.Marker.prototype.show = function() {
     var marker = new google.maps.Marker({
       position : new google.maps.LatLng(locus.latitude, locus.longitude), 
       map      : locus.map, 
-      title    : locus.name,
+      title    : locus.name
       // icon  : pointer_image
     });
     locus.marker = marker;
