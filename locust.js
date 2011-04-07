@@ -205,11 +205,17 @@ locust.Map.prototype.initialize = function() {
 
 
   var latlng = new google.maps.LatLng(this.center.latitude, this.center.longitude);
+
   var myOptions = {
-    zoom           : this.zoomLevel,
-    center         : latlng,
-    mapTypeId      : this.mapType,
-    mapTypeControl : this.mapTypeControl
+    zoom               : this.zoomLevel,
+    center             : latlng,
+    mapTypeId          : this.mapType,
+    mapTypeControl     : this.mapTypeControl,
+    panControl         : this.panControl,
+    zoomControl        : this.zoomControl,
+    scaleControl       : this.scaleControl,
+    streetViewControl  : this.streetViewControl,
+    overviewMapControl : this.overviewMapControl
   };
 
   this.map = new google.maps.Map(document.getElementById(this.canvasID), myOptions);
