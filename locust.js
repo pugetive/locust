@@ -337,10 +337,12 @@ locust.Map.prototype.showMarkersByTag = function(tag, open_info_window){
   var bounds = new google.maps.LatLngBounds();
 
   for(i = 0; i < markers.length; ++i){
-    markers[i].show();
-    bounds.extend(markers[i].latLng);
-    if (open_info_window){
-      markers[i].showInfoWindow();
+    if (!isNaN(markers[i].latLng.lat()) && !isNaN(markers[i].latLng.lng())){
+      markers[i].show();
+      bounds.extend(markers[i].latLng);
+      if (open_info_window){
+        markers[i].showInfoWindow();
+      }
     }
   }
   if (markers.length > 1){
